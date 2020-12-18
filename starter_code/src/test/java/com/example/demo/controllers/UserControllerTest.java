@@ -7,7 +7,6 @@ import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -26,8 +25,8 @@ public class UserControllerTest {
     public void setup(){
         userController = new UserController();
         TestUtils.injectsObjects(userController, "userRepository", userRepository);
-        TestUtils.injectsObjects(userController, "userRepository", cartRepository);
-        TestUtils.injectsObjects(userController, "userRepository", encoder);
+        TestUtils.injectsObjects(userController, "cartRepository", cartRepository);
+        TestUtils.injectsObjects(userController, "bCryptPasswordEncoder", encoder);
     }
 
     @Test
