@@ -48,4 +48,45 @@ public class UserControllerTest {
         assertEquals("this is Hashed", user.getPassword());
 
     }
+
+    @Test
+    public void create_user_bad_request() throws Exception{
+        when(encoder.encode("testPassword")).thenReturn("this is Hashed");
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUsername("test");
+        createUserRequest.setPassword("test");
+        createUserRequest.setConfirmedPassword("testPassword");
+
+        final ResponseEntity<User> response = userController.createUser(createUserRequest);
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCodeValue());
+
+    }
+
+    @Test
+    public void findbyusername_happy_path() throws Exception{
+        when(encoder.encode("testPassword")).thenReturn("this is Hashed");
+        ResponseEntity<User> response = createNewUser();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+
+        response = userController.findByUserName(response.getBody().getUsername());
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+
+        User user = response.getBody();
+        assertNotNull(user);
+        assertEquals("test", user.getUsername());
+
+    }
+    private ResponseEntity<User> createNewUser(){
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUsername("test");
+        createUserRequest.setPassword("testPassword");
+        createUserRequest.setConfirmedPassword("testPassword");
+
+        return userController.createUser(createUserRequest);
+    }
+
+
 }
