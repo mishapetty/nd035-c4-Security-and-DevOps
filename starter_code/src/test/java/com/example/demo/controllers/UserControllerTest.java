@@ -10,8 +10,12 @@ import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,14 +73,52 @@ public class UserControllerTest {
         ResponseEntity<User> response = createNewUser();
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
+        User user = new User();
+        user.setUsername("test");
+        when(userRepository.findByUsername(anyString())).thenReturn(user);
         response = userController.findByUserName(response.getBody().getUsername());
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
 
-        User user = response.getBody();
+        user = response.getBody();
         assertNotNull(user);
         assertEquals("test", user.getUsername());
+
+    }
+    @Test
+    public void findbyid_happy_path() throws Exception{
+        when(encoder.encode("testPassword")).thenReturn("this is Hashed");
+        ResponseEntity<User> response = createNewUser();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        User user = new User();
+        user.setUsername("test");
+        Optional<User> optionalUser = Optional.of(user);
+        when(userRepository.findById(anyLong())).thenReturn((optionalUser));
+        response = userController.findById(0L);
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+
+        user = response.getBody();
+        assertNotNull(user);
+        assertEquals("test", user.getUsername());
+
+    }
+
+    @Test
+    public void findbyid_not_found() throws Exception{
+        when(encoder.encode("testPassword")).thenReturn("this is Hashed");
+        ResponseEntity<User> response = createNewUser();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+
+        response = userController.findById(0L);
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCodeValue());
+
+        User user = response.getBody();
+        assertNull(user);
+
 
     }
     private ResponseEntity<User> createNewUser(){
